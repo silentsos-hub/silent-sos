@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SILENT-SOS — Prototype</title>
+<style>
+:root{
+  --navy:#0b2a68; --blue:#2563eb; --light:#eef4ff; --panel:#f6f8fd;
+  --muted:#64748b; --green:#18b968; --red:#ef4444; --white:#fff; --line:#dbe4f4;
+  --shadow:0 16px 45px rgba(11,42,104,.12); --radius:24px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f4f7fd;color:#102a56}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh}
+.topbar{height:76px;background:white;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;color:var(--navy);font-size:23px}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--navy);display:grid;place-items:center;color:white;font-size:21px}
+.nav{display:flex;gap:8px}
+.nav button{border:0;background:transparent;padding:10px 14px;color:#52627d;font-weight:700;border-radius:12px}
+.nav button.active,.nav button:hover{background:var(--light);color:var(--blue)}
+.main{max-width:1180px;margin:auto;padding:34px 20px 60px}
+.page{display:none}.page.active{display:block}
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:center}
+.hero-card{background:linear-gradient(135deg,#0b2a68,#1646a0);color:#fff;border-radius:32px;padding:52px;min-height:500px;display:flex;flex-direction:column;justify-content:center;box-shadow:var(--shadow)}
+.eyebrow{font-size:13px;letter-spacing:1.5px;text-transform:uppercase;opacity:.75;font-weight:800}
+h1{font-size:54px;line-height:1.02;margin:12px 0}.hero-card p{font-size:18px;line-height:1.6;max-width:520px;color:#dbe7ff}
+.cta{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+.btn{border:0;border-radius:13px;padding:14px 20px;font-weight:800}
+.btn.primary{background:var(--blue);color:white}.btn.white{background:white;color:var(--navy)}
+.btn.outline{background:white;border:1px solid #b9c9e7;color:var(--navy)}
+.preview{background:white;border:1px solid var(--line);border-radius:32px;padding:28px;box-shadow:var(--shadow)}
+.phone{max-width:320px;margin:auto;background:#071b46;border:9px solid #111827;border-radius:38px;padding:13px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.phone-screen{background:#f7faff;border-radius:27px;min-height:500px;padding:22px 16px;display:flex;flex-direction:column}
+.notch{width:80px;height:6px;border-radius:10px;background:#111;margin:0 auto 24px}
+.sos{width:170px;height:170px;border-radius:50%;margin:55px auto 18px;background:var(--red);color:white;border:12px solid #ffd4d4;box-shadow:0 0 0 10px #fee2e2;display:grid;place-items:center;font-size:32px;font-weight:900}
+.small{text-align:center;color:var(--muted);font-size:12px;line-height:1.5}
+.card{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:0 10px 30px rgba(11,42,104,.06)}
+.form-card{max-width:620px;margin:auto}
+h2{margin:0 0 8px;font-size:30px}.sub{color:var(--muted);margin:0 0 24px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}
+label{font-size:12px;font-weight:800;color:#52627d}
+input,select{width:100%;padding:13px 14px;border:1px solid #cbd7eb;border-radius:12px;outline:none;background:#fff;color:#173461}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #dbe8ff}
+.actions{display:flex;justify-content:space-between;gap:12px;margin-top:24px}
+.steps{display:flex;gap:8px;margin-bottom:20px}.step{height:6px;flex:1;background:#dbe5f5;border-radius:10px}.step.on{background:var(--blue)}
+.summary-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:20px}
+.info-list{display:grid;gap:12px}.info{display:flex;justify-content:space-between;padding:14px;background:var(--panel);border-radius:14px}.tag{padding:5px 9px;background:#e8f1ff;color:var(--blue);border-radius:20px;font-size:11px;font-weight:800}
+.home-grid{display:grid;grid-template-columns:1fr .8fr;gap:22px}
+.center{text-align:center}
+.big-sos{width:240px;height:240px;border-radius:50%;border:18px solid #ffd5d5;background:var(--red);color:white;font-size:46px;font-weight:900;box-shadow:0 0 0 15px #fee2e2,0 22px 60px rgba(239,68,68,.3);margin:35px auto 24px;display:grid;place-items:center}
+.status{padding:15px;border-radius:14px;background:#eaf9f0;color:#08743d;font-weight:800;display:flex;align-items:center;gap:10px}
+.timeline{display:grid;gap:12px;margin-top:18px}.event{display:flex;gap:12px;align-items:flex-start}.dot{width:11px;height:11px;border-radius:50%;background:var(--green);margin-top:5px;flex:none}
+.activation{background:#071b46;color:white;min-height:520px;border-radius:30px;display:grid;place-items:center;text-align:center;padding:30px}
+.activation .sos2{width:170px;height:170px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-size:34px;font-weight:900;box-shadow:0 0 0 15px rgba(239,68,68,.15)}
+.progress{height:9px;background:#e1e8f4;border-radius:10px;overflow:hidden;margin:18px 0}.bar{height:100%;background:var(--blue);width:0;transition:width .8s}
+.map{height:390px;border-radius:22px;background:
+linear-gradient(30deg,transparent 48%,#dbe5f5 49%,#dbe5f5 51%,transparent 52%),
+linear-gradient(150deg,transparent 48%,#dbe5f5 49%,#dbe5f5 51%,transparent 52%),#f1f6ff;
+position:relative;overflow:hidden;border:1px solid var(--line)}
+.road{position:absolute;height:18px;background:white;box-shadow:0 0 0 2px #d9e4f4;transform:rotate(-25deg);left:-30px;right:-30px;top:50%}
+.pin{position:absolute;left:30%;top:55%;width:24px;height:24px;border-radius:50% 50% 50% 0;background:var(--red);transform:rotate(-45deg)}.pin:after{content:'';position:absolute;width:8px;height:8px;background:white;border-radius:50%;left:8px;top:8px}
+.ambulance{position:absolute;right:28%;top:30%;background:white;border:2px solid var(--blue);border-radius:10px;padding:9px;color:var(--blue);font-weight:900}
+.footer{text-align:center;color:#8491a7;font-size:12px;margin-top:25px}
+.toast{position:fixed;right:20px;bottom:20px;background:#0b2a68;color:white;padding:15px 18px;border-radius:14px;box-shadow:var(--shadow);display:none;z-index:50}
+@media(max-width:850px){.hero,.home-grid,.summary-grid{grid-template-columns:1fr}.hero-card{padding:35px;min-height:auto}h1{font-size:42px}.nav{display:none}.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.main{padding:20px 14px}.big-sos{width:190px;height:190px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="logo">♥</div>SILENT-SOS</div>
+  <nav class="nav">
+    <button onclick="show('home')" id="nav-home">Home</button>
+    <button onclick="show('profile')" id="nav-profile">Profile</button>
+    <button onclick="show('status')" id="nav-status">Response Status</button>
+  </nav>
+</header>
+
+<main class="main">
+<section id="landing" class="page active">
+  <div class="hero">
+    <div class="hero-card">
+      <div class="eyebrow">Fast. Safe. Connected.</div>
+      <h1>When you can't speak, your phone can.</h1>
+      <p>SILENT-SOS is a patient-centred emergency-response prototype designed around a long-press SOS action, a secure medical profile, emergency contacts and a simulated dispatcher workflow.</p>
+      <div class="cta">
+        <button class="btn white" onclick="show('auth')">Get Started</button>
+        <button class="btn outline" onclick="show('home')" style="background:transparent;color:white;border-color:#9db6e8">View Demo</button>
+      </div>
+      <p style="font-size:12px;margin-top:28px">Prototype simulation — not connected to a live emergency service.</p>
+    </div>
+    <div class="preview">
+      <div class="phone"><div class="phone-screen">
+        <div class="notch"></div><div class="eyebrow" style="color:#0b2a68;text-align:center">Emergency Assistance</div>
+        <div class="sos">SOS</div>
+        <div class="small"><b>LONG PRESS / LONG SQUEEZE</b><br>Press and hold for 3 seconds to request emergency assistance.</div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section id="auth" class="page">
+ <div class="card form-card">
+  <div class="steps"><span class="step on"></span><span class="step"></span><span class="step"></span><span class="step"></span></div>
+  <h2>Welcome to SILENT-SOS</h2><p class="sub">Create an account to securely manage your emergency profile.</p>
+  <div class="grid">
+   <div class="field full"><label>FULL NAME</label><input id="name" value="Ananya S"></div>
+   <div class="field"><label>EMAIL</label><input type="email" value="ananya@example.com"></div>
+   <div class="field"><label>PASSWORD</label><input type="password" value="password"></div>
+  </div>
+  <div class="actions"><button class="btn outline" onclick="show('landing')">Back</button><button class="btn primary" onclick="show('patient')">Create Profile</button></div>
+ </div>
+</section>
+
+<section id="patient" class="page">
+ <div class="card form-card">
+  <div class="steps"><span class="step on"></span><span class="step on"></span><span class="step"></span><span class="step"></span></div>
+  <h2>Personal Information</h2><p class="sub">Add the basic details responders may need.</p>
+  <div class="grid">
+   <div class="field full"><label>FULL NAME</label><input id="pname" value="Ananya S"></div>
+   <div class="field"><label>AGE</label><input id="age" value="20"></div>
+   <div class="field"><label>GENDER</label><select><option>Female</option><option>Male</option><option>Prefer not to say</option></select></div>
+   <div class="field"><label>BLOOD GROUP</label><select><option>B+</option><option>A+</option><option>O+</option><option>AB+</option></select></div>
+  </div>
+  <div class="actions"><button class="btn outline" onclick="show('auth')">Back</button><button class="btn primary" onclick="show('medical')">Next</button></div>
+ </div>
+</section>
+
+<section id="medical" class="page">
+ <div class="card form-card">
+  <div class="steps"><span class="step on"></span><span class="step on"></span><span class="step on"></span><span class="step"></span></div>
+  <h2>Medical Profile</h2><p class="sub">Keep important medical information available for an emergency.</p>
+  <div class="grid">
+   <div class="field full"><label>MEDICAL CONDITIONS</label><input value="Asthma"></div>
+   <div class="field full"><label>SERIOUS ALLERGIES</label><input value="Peanuts"></div>
+   <div class="field full"><label>IMPORTANT MEDICATIONS</label><input value="Inhaler as needed"></div>
+  </div>
+  <div class="status" style="margin-top:18px">✓ Emergency Data Sharing — On</div>
+  <div class="actions"><button class="btn outline" onclick="show('patient')">Back</button><button class="btn primary" onclick="show('contacts')">Next</button></div>
+ </div>
+</section>
+
+<section id="contacts" class="page">
+ <div class="card form-card">
+  <div class="steps"><span class="step on"></span><span class="step on"></span><span class="step on"></span><span class="step on"></span></div>
+  <h2>Emergency Contacts</h2><p class="sub">Add people who can be contacted during an emergency.</p>
+  <div class="grid">
+   <div class="field"><label>PRIMARY CONTACT</label><input value="Father"></div>
+   <div class="field"><label>PHONE</label><input value="+91 XXXXX XXXXX"></div>
+   <div class="field"><label>SECONDARY CONTACT</label><input value="Mother"></div>
+   <div class="field"><label>PHONE</label><input value="+91 XXXXX XXXXX"></div>
+  </div>
+  <div class="actions"><button class="btn outline" onclick="show('medical')">Back</button><button class="btn primary" onclick="saveProfile()">Save Profile</button></div>
+ </div>
+</section>
+
+<section id="profile" class="page">
+ <div class="summary-grid">
+  <div class="card">
+   <h2>Medical Summary</h2><p class="sub">Your emergency profile at a glance.</p>
+   <div class="info-list">
+    <div class="info"><span>Name</span><b id="summaryName">Ananya S</b></div>
+    <div class="info"><span>Age</span><b>20</b></div>
+    <div class="info"><span>Blood Group</span><span class="tag">B+</span></div>
+    <div class="info"><span>Medical Condition</span><b>Asthma</b></div>
+    <div class="info"><span>Serious Allergy</span><b>Peanuts</b></div>
+    <div class="info"><span>Medication</span><b>Inhaler as needed</b></div>
+    <div class="info"><span>Emergency Contact</span><b>Father</b></div>
+   </div>
+  </div>
+  <div class="card">
+   <h2>Privacy</h2><p class="sub">Control when information is shared.</p>
+   <div class="status">✓ Emergency-use consent enabled</div>
+   <p class="small" style="text-align:left;margin-top:18px">Information is intended for the simulated emergency workflow in this prototype.</p>
+   <button class="btn primary" style="width:100%;margin-top:18px" onclick="show('home')">Go to Home</button>
+  </div>
+ </div>
+</section>
+
+<section id="home" class="page">
+ <div class="home-grid">
+  <div class="card center">
+   <div class="eyebrow" style="color:var(--blue)">Emergency Assistance</div>
+   <h2 style="margin-top:7px">Need help?</h2>
+   <button class="big-sos" id="sosBtn" onmousedown="startSOS()" onmouseup="cancelSOS()" ontouchstart="startSOS()" ontouchend="cancelSOS()">SOS</button>
+   <p class="small"><b>LONG PRESS / LONG SQUEEZE</b><br>Press and hold for 3 seconds to request emergency assistance.</p>
+   <div class="progress"><div class="bar" id="sosBar"></div></div>
+   <button class="btn outline" onclick="show('profile')">View Medical Profile</button>
+  </div>
+  <div class="card">
+   <h2>Prototype Features</h2>
+   <div class="timeline">
+    <div class="event"><div class="dot"></div><div><b>Secure medical profile</b><br><span class="small">Conditions, allergies, medication and contacts.</span></div></div>
+    <div class="event"><div class="dot"></div><div><b>Location sharing</b><br><span class="small">Simulated location for this demo.</span></div></div>
+    <div class="event"><div class="dot"></div><div><b>Dispatcher workflow</b><br><span class="small">Simulated prioritisation and ambulance status.</span></div></div>
+    <div class="event"><div class="dot"></div><div><b>Privacy control</b><br><span class="small">Emergency-use consent is visible.</span></div></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="activated" class="page">
+ <div class="activation">
+  <div><div class="eyebrow">SILENT-SOS</div><h2 style="color:white;margin-top:10px">Emergency Activated</h2><div class="sos2">SOS</div>
+  <p>Emergency request prepared.</p><button class="btn outline" onclick="show('collecting')">Continue to Request</button>
+  <button class="btn" style="background:transparent;color:white;border:1px solid #5274ad;margin-left:8px" onclick="show('home')">Cancel</button></div>
+ </div>
+</section>
+
+<section id="collecting" class="page">
+ <div class="card form-card">
+  <div class="status">● Preparing Emergency Request</div>
+  <h2 style="margin-top:22px">Collecting Information</h2><p class="sub">Essential information is being prepared for the simulated authorised emergency workflow.</p>
+  <div class="timeline">
+   <div class="event"><div class="dot"></div><div><b>STEP 1 — LOCATION AVAILABLE</b><br><span class="small">Simulated location detected</span></div></div>
+   <div class="event"><div class="dot"></div><div><b>STEP 2 — MEDICAL PROFILE</b><br><span class="small">Essential medical information prepared</span></div></div>
+   <div class="event"><div class="dot"></div><div><b>STEP 3 — EMERGENCY CONTACTS</b><br><span class="small">Primary and secondary contacts available</span></div></div>
+   <div class="event"><div class="dot"></div><div><b>STEP 4 — EMERGENCY DATA</b><br><span class="small">Consent confirmed</span></div></div>
+  </div>
+  <button class="btn primary" style="width:100%;margin-top:24px" onclick="show('sent')">Send Request</button>
+ </div>
+</section>
+
+<section id="sent" class="page">
+ <div class="card form-card center">
+  <div style="font-size:70px">✓</div><h2>Request Sent</h2><p class="sub">Your emergency request has been prepared and submitted to the simulated response workflow.</p>
+  <div class="info-list" style="text-align:left">
+   <div class="info"><span>Location</span><b>Simulated</b></div>
+   <div class="info"><span>Medical profile</span><b>Prepared</b></div>
+   <div class="info"><span>Emergency contacts</span><b>Transmitted</b></div>
+   <div class="info"><span>Emergency status</span><span class="tag">Active</span></div>
+  </div>
+  <button class="btn primary" style="width:100%;margin-top:20px" onclick="show('response')">View Response Status →</button>
+ </div>
+</section>
+
+<section id="response" class="page">
+ <div class="home-grid">
+  <div class="card">
+   <div class="status">✓ Emergency response active</div>
+   <h2 style="margin-top:20px">Emergency Response</h2>
+   <p class="sub">Simulated dispatcher workflow with prioritisation and resource matching.</p>
+   <div class="timeline">
+    <div class="event"><div class="dot"></div><div><b>Request received</b><br><span class="small">Emergency request acknowledged</span></div></div>
+    <div class="event"><div class="dot"></div><div><b>AI-assisted analysis</b><br><span class="small">Profile matched to simulated response priority</span></div></div>
+    <div class="event"><div class="dot"></div><div><b>Human dispatcher review</b><br><span class="small">Dispatcher coordination simulated</span></div></div>
+    <div class="event"><div class="dot"></div><div><b>Ambulance dispatched</b><br><span class="small">Demo unit assigned</span></div></div>
+   </div>
+   <button class="btn primary" style="width:100%;margin-top:24px" onclick="show('live')">View on Map</button>
+  </div>
+  <div class="card center"><div class="eyebrow">ETA</div><div style="font-size:54px;font-weight:900;color:var(--navy);margin:18px">8 min</div><p class="sub">Simulated response time</p><button class="btn outline" onclick="show('live')">Live Response →</button></div>
+ </div>
+</section>
+
+<section id="live" class="page">
+ <div class="card">
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+   <div><h2>Live Emergency Response</h2><p class="sub">Follow the simulated response status.</p></div>
+   <div class="status">● Ambulance on the way</div>
+  </div>
+  <div class="map"><div class="road"></div><div class="pin"></div><div class="ambulance">🚑 DEMO UNIT</div></div>
+  <div class="grid" style="margin-top:18px">
+   <div class="card" style="box-shadow:none;background:var(--panel)"><b>✓ Request received</b><br><span class="small">Acknowledged</span></div>
+   <div class="card" style="box-shadow:none;background:var(--panel)"><b>✓ Dispatcher assigned</b><br><span class="small">Human review complete</span></div>
+   <div class="card" style="box-shadow:none;background:var(--panel)"><b>✓ Ambulance dispatched</b><br><span class="small">Demo unit AMB-204</span></div>
+   <div class="card" style="box-shadow:none;background:var(--panel)"><b>→ Ambulance en route</b><br><span class="small">ETA: 8 minutes</span></div>
+  </div>
+  <div class="actions"><button class="btn outline" onclick="show('response')">View Response Status</button><button class="btn primary" onclick="toast('Dispatcher contact is simulated in this prototype.')">Contact Dispatcher</button></div>
+ </div>
+</section>
+
+<div class="footer">SILENT-SOS prototype simulation — not connected to a live emergency service.</div>
+</main>
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+let timer=null, progress=0;
+function show(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  if(['home','profile','status'].includes(id)) document.getElementById('nav-'+(id==='status'?'status':id)).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function saveProfile(){
+  const n=document.getElementById('pname').value || document.getElementById('name').value || 'User';
+  document.getElementById('summaryName').textContent=n;
+  show('profile'); toast('Profile saved successfully.');
+}
+function startSOS(){
+  clearInterval(timer); progress=0;
+  timer=setInterval(()=>{
+    progress+=4; document.getElementById('sosBar').style.width=progress+'%';
+    if(progress>=100){clearInterval(timer); show('activated');}
+  },120);
+}
+function cancelSOS(){
+  if(progress<100){clearInterval(timer);progress=0;document.getElementById('sosBar').style.width='0%';}
+}
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';
+  setTimeout(()=>t.style.display='none',2600);
+}
+</script>
+</body>
+</html>
